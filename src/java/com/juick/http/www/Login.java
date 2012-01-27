@@ -57,7 +57,7 @@ public class Login {
             out.println("</div>");
             out.println("</div>");
 
-            PageTemplates.pageFooter(out, locale);
+            PageTemplates.pageFooter(request, out, locale, visitor);
         } finally {
             out.close();
         }
@@ -98,7 +98,12 @@ public class Login {
             c.setMaxAge(0);
             response.addCookie(c);
 
-            response.sendRedirect("/");
+            String referer = request.getHeader("Referer");
+            if (referer != null && referer.startsWith("http://juick.com/") && !referer.equals("http://juick.com/login")) {
+                response.sendRedirect(referer);
+            } else {
+                response.sendRedirect("/");
+            }
         } else {
             response.sendError(403);
         }

@@ -56,7 +56,7 @@ public class Map {
             out.println("$(window).unload(GUnload);");
             out.println("</script>");
 
-            PageTemplates.pageFooter(out, locale);
+            PageTemplates.pageFooter(request, out, locale, visitor);
         } finally {
             out.close();
         }

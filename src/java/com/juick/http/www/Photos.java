@@ -92,7 +92,7 @@ public class Photos {
             out.println("});");
             out.println("</script>");
 
-            PageTemplates.pageFooter(out, locale);
+            PageTemplates.pageFooter(request, out, locale, visitor);
         } finally {
             out.close();
         }

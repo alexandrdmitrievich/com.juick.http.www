@@ -101,6 +101,8 @@ public class Utils {
         String ret = str;
         ret = ret.replaceAll("<", "&lt;");
         ret = ret.replaceAll(">", "&gt;");
+        ret = ret.replaceAll("'", "&apos;");
+        ret = ret.replaceAll("\"", "&quot;");
         return str;
     }
 

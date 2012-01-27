@@ -140,7 +140,7 @@ public class User {
             out.println("</div>");
             out.println("</div>");
 
-            PageTemplates.pageFooter(out, locale);
+            PageTemplates.pageFooter(request, out, locale, visitor);
         } finally {
             out.close();
         }

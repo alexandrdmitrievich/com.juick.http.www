@@ -17,6 +17,10 @@
                 <library dirs="200">
                     <file>${libs.MySQLDriver.classpath}</file>
                 </library>
+                <library dirs="200">
+                    <file>${reference.com_juick_xmpp.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
             </web-module-libraries>
             <web-module-additional-libraries/>
             <source-roots>
@@ -37,6 +41,14 @@
             </reference>
             <reference>
                 <foreign-project>com_juick_server</foreign-project>
+                <artifact-type>jar</artifact-type>
+                <script>build.xml</script>
+                <target>jar</target>
+                <clean-target>clean</clean-target>
+                <id>jar</id>
+            </reference>
+            <reference>
+                <foreign-project>com_juick_xmpp</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>

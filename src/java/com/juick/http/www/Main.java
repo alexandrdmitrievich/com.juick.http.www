@@ -17,6 +17,7 @@
  */
 package com.juick.http.www;
 
+import com.juick.xmpp.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -28,16 +29,18 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import ru.sape.Sape;
 
 /**
  *
  * @author Ugnich Anton
  */
 @WebServlet(name = "Main", urlPatterns = {"/"})
-public class Main extends HttpServlet {
+public class Main extends HttpServlet implements XmppListener {
 
     Connection sql;
     Connection sqlSearch;
+    XmppConnection xmpp;
     Blogs blogs = new Blogs();
     Chats chats = new Chats();
     Photos photos = new Photos();
@@ -58,6 +61,13 @@ public class Main extends HttpServlet {
             Class.forName("com.mysql.jdbc.Driver");
             sql = DriverManager.getConnection("jdbc:mysql://localhost/juick?autoReconnect=true&user=" + conf.getProperty("mysql_username", "") + "&password=" + conf.getProperty("mysql_password", ""));
             sqlSearch = DriverManager.getConnection("jdbc:mysql://127.0.0.1:9306/juick?autoReconnect=true&characterEncoding=utf8&maxAllowedPacket=512000&relaxAutoCommit=true&user=root&password=");
+            /*
+            xmpp = new XmppConnectionComponent(new JID("www.juick.com"), conf.getProperty("xmpp_password", ""), "127.0.0.1", 5347, false);
+            xmpp.addListener((XmppListener) this);
+            xmpp.start();
+             */
+
+            PageTemplates.sape = new Sape(conf.getProperty("sape_user"), "juick.com", 2000, 3600);
         } catch (Exception e) {
             log(null, e);
         }
@@ -69,10 +79,34 @@ public class Main extends HttpServlet {
         if (sql != null) {
             try {
                 sql.close();
+                sql = null;
             } catch (SQLException e) {
                 log(null, e);
             }
         }
+        if (sqlSearch != null) {
+            try {
+                sqlSearch.close();
+                sqlSearch = null;
+            } catch (SQLException e) {
+                log(null, e);
+            }
+        }
+    }
+
+    @Override
+    public void onAuth(String resource) {
+        log("XMPP AUTH: " + resource);
+    }
+
+    @Override
+    public void onAuthFailed(String message) {
+        log("XMPP AUTH FAILED: " + message);
+    }
+
+    @Override
+    public void onConnectionFailed(String message) {
+        log("XMPP CONNECTION FAILED: " + message);
     }
 
     /** 
@@ -97,7 +131,12 @@ public class Main extends HttpServlet {
         } else if (uri.equals("/map")) {
             map.doGet(sql, request, response);
         } else if (uri.equals("/post")) {
-            pagesNewMessage.doGetNewMessage(sql, request, response);
+            com.juick.User visitor = Utils.getVisitorUser(sql, request);
+            if (visitor != null) {
+                pagesNewMessage.doGetNewMessage(sql, request, response, visitor);
+            } else {
+                login.doGetLoginForm(sql, request, response);
+            }
         } else if (uri.equals("/login")) {
             if (request.getQueryString() == null) {
                 login.doGetLoginForm(sql, request, response);

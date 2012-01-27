@@ -40,7 +40,6 @@ public class UserThread {
     protected void doGetThread(Connection sql, HttpServletRequest request, HttpServletResponse response, com.juick.User user, int MID) throws ServletException, IOException {
         com.juick.User visitor = Utils.getVisitorUser(sql, request);
         Locale locale = request.getLocale();
-        ResourceBundle rb = ResourceBundle.getBundle("User", locale);
 
         boolean listview = false;
         String paramView = request.getParameter("view");
@@ -69,24 +68,9 @@ public class UserThread {
             out.println("<div id=\"wrapper\">");
             out.println("<div id=\"content\" style=\"margin-left: 0; width: 100%\">");
 
-            out.println("<ul>");
             printMessage(out, sql, MID, locale);
-            out.println("</ul>");
 
-            out.println("<div class=\"title2\">");
-            out.print("  <div class=\"title2-right\">");
-            if (listview) {
-                out.print("<a href=\"?view=tree\">" + rb.getString("View as tree") + "</a>");
-            } else {
-                out.print("<a href=\"#\" onclick=\"$('#replies>li').show(); $('#replies .msg-comments').hide(); return false\">" + rb.getString("Expand all") + "</a> &#183; <a href=\"?view=list\">" + rb.getString("View as list") + "</a>");
-            }
-            out.print("</div>");
-            out.println("  <h2>Replies</h2>");
-            out.println("</div>");
-
-            out.println("<ul id=\"replies\">");
             printReplies(out, sql, MID, locale, listview);
-            out.println("</ul>");
 
             out.println("<script type=\"text/javascript\">");
             out.println("$(\"textarea\").autoResize();");
@@ -96,7 +80,7 @@ public class UserThread {
 
             out.println("</div>");
 
-            PageTemplates.pageFooter(out, locale);
+            PageTemplates.pageFooter(request, out, locale, visitor);
         } finally {
             out.close();
         }
@@ -143,11 +127,12 @@ public class UserThread {
 
                 txt = PageTemplates.formatMessage(txt);
 
-                out.println("  <li class=\"msg\" style=\"border: 0\">");
+                out.println("<ul>");
+                out.println("  <li id=\"msg-" + mid + "\" class=\"msg\" style=\"border: 0\">");
 
                 if (rs.getString(11) != null) {
                     if (rs.getString(11).equals("jpg")) {
-                        out.println("    <div class=\"msg-media\"><img src=\"http://i.juick.com/photos-512/" + mid + ".jpg\" alt=\"\"/></div>");
+                        out.println("    <div class=\"msg-media\"><a href=\"http://i.juick.com/photos-1024/" + mid + ".jpg\"><img src=\"http://i.juick.com/photos-512/" + mid + ".jpg\" alt=\"\"/></a></div>");
                     } else {
                         out.println("    <div class=\"msg-media\"><div id=\"video-" + mid + "\"><b>Attachment: <a href=\"http://i.juick.com/video/" + mid + ".mp4\">Video</a></b></div></div>");
                         out.println("    <script type=\"text/javascript\">");
@@ -162,7 +147,13 @@ public class UserThread {
                 out.println("    </ul></div></div>");
                 out.println("    <div class=\"msg-header\"><a href=\"/" + uname + "/\">@" + uname + "</a>:" + tags + "</div>");
                 out.println("    <div class=\"msg-txt\">" + txt + "</div>");
+
+                out.println("    <form action=\"/post\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"mid\" value=\"" + mid + "\"/>");
+                out.println("      <div class=\"msg-comment\"><textarea name=\"body\" rows=\"1\" placeholder=\"Add a comment...\" onkeypress=\"postformListener(this.form,event)\"></textarea></div>");
+                out.println("    </form>");
+
                 out.println("  </li>");
+                out.println("</ul>");
             }
         } catch (SQLException e) {
             System.err.println(e);
@@ -173,6 +164,7 @@ public class UserThread {
     }
 
     public static void printReplies(PrintWriter out, Connection sql, int mid, Locale locale, boolean listview) {
+        ResourceBundle rbuser = ResourceBundle.getBundle("User", locale);
         ArrayList<com.juick.Message> replies = new ArrayList<com.juick.Message>();
 
         PreparedStatement stmt = null;
@@ -217,10 +209,26 @@ public class UserThread {
             Utils.finishSQL(rs, stmt);
         }
 
-        if (listview) {
-            printList(out, replies, locale);
-        } else {
-            printTree(out, replies, 0, 0, locale);
+        if (!replies.isEmpty()) {
+
+            out.println("<div class=\"title2\">");
+            out.print("  <div class=\"title2-right\">");
+            if (listview) {
+                out.print("<a href=\"?view=tree\">" + rbuser.getString("View as tree") + "</a>");
+            } else {
+                out.print("<a href=\"#\" onclick=\"$('#replies>li').show(); $('#replies .msg-comments').hide(); return false\">" + rbuser.getString("Expand all") + "</a> &#183; <a href=\"?view=list\">" + rbuser.getString("View as list") + "</a>");
+            }
+            out.print("</div>");
+            out.println("  <h2>Replies (" + replies.size() + ")</h2>");
+            out.println("</div>");
+
+            out.println("<ul id=\"replies\">");
+            if (listview) {
+                printList(out, replies, locale);
+            } else {
+                printTree(out, replies, 0, 0, locale);
+            }
+            out.println("</ul>");
         }
 
         for (int i = 0; i < replies.size(); i++) {
@@ -230,6 +238,8 @@ public class UserThread {
     }
 
     public static void printTree(PrintWriter out, ArrayList<com.juick.Message> replies, int ReplyTo, int margin, Locale locale) {
+        ResourceBundle rb = ResourceBundle.getBundle("Global", locale);
+
         for (int i = 0; i < replies.size(); i++) {
             com.juick.Message msg = replies.get(i);
             if (msg.ReplyTo == ReplyTo) {
@@ -258,6 +268,8 @@ public class UserThread {
                 out.println("    </ul></div></div>");
                 out.println("    <div class=\"msg-header\"><a href=\"/" + msg.User.UName + "/\">@" + msg.User.UName + "</a>:</div>");
                 out.println("    <div class=\"msg-txt\">" + msg.Text + "</div>");
+                out.println("    <div class=\"msg-links\"><a href=\"#\" onclick=\"return showCommentFormComment(" + msg.MID + "," + msg.RID + ")\">" + rb.getString("Comment") + "</a></div>");
+                out.println("    <div class=\"msg-comment\" style=\"display: none\"></div>");
                 if (ReplyTo == 0) {
                     int childs = msg.getChildsCount() - 1;
                     if (childs > 0) {
@@ -272,6 +284,8 @@ public class UserThread {
     }
 
     public static void printList(PrintWriter out, ArrayList<com.juick.Message> replies, Locale locale) {
+        ResourceBundle rb = ResourceBundle.getBundle("Global", locale);
+
         for (int i = 0; i < replies.size(); i++) {
             com.juick.Message msg = replies.get(i);
 
@@ -292,6 +306,8 @@ public class UserThread {
             out.println("    </ul></div></div>");
             out.println("    <div class=\"msg-header\"><a href=\"/" + msg.User.UName + "/\">@" + msg.User.UName + "</a>:</div>");
             out.println("    <div class=\"msg-txt\">" + msg.Text + "</div>");
+            out.println("    <div class=\"msg-links\"><a href=\"#\" onclick=\"return showCommentFormComment(" + msg.MID + "," + msg.RID + ")\">" + rb.getString("Comment") + "</a></div>");
+            out.println("    <div class=\"msg-comment\" style=\"display: none\"></div>");
             out.println("  </li>");
         }
     }

@@ -27,12 +27,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import javax.servlet.http.HttpServletRequest;
+import ru.sape.Sape;
 
 /**
  *
  * @author Ugnich Anton
  */
 public class PageTemplates {
+
+    public static Sape sape = null;
 
     public static void pageHead(PrintWriter out, String title, String headers) {
         out.println("<!DOCTYPE html>");
@@ -61,7 +65,7 @@ public class PageTemplates {
         out.println("<div id=\"logo\"><a href=\"/?show=my\"><img src=\"http://static.juick.com/logo3.png\" width=\"120\" height=\"40\" alt=\"Juick\" border=\"0\"/></a></div>");
         out.println("  <ul id=\"nav\">");
         out.println("    <li><a href=\"/\">" + rb.getString("Blogs") + "</a></li>");
-        out.println("    <li><a href=\"/chats\">" + rb.getString("Chats") + "</a></li>");
+//        out.println("    <li><a href=\"/chats\">" + rb.getString("Chats") + "</a></li>");
         out.println("    <li><a href=\"/photos\">" + rb.getString("Photos") + "</a></li>");
         out.println("    <li><a href=\"/map\">" + rb.getString("Map") + "</a></li>");
         out.println("  </ul>");
@@ -187,11 +191,18 @@ public class PageTemplates {
         out.println();
     }
 
-    public static void pageFooter(PrintWriter out, Locale loc) {
+    public static void pageFooter(HttpServletRequest request, PrintWriter out, Locale loc, com.juick.User visitor) {
         ResourceBundle rb = ResourceBundle.getBundle("Global", loc);
         out.println("<div id=\"fwrapper\"><div id=\"footer\">");
         out.println("  <div id=\"footer-right\"><a href=\"/help/contacts\">" + rb.getString("Contacts") + "</a> &#183; <a href=\"/help/\">" + rb.getString("Help") + "</a></div>");
-        out.println("  <div id=\"footer-left\">juick.com &copy; 2008-2011</div>");
+        out.print("  <div id=\"footer-left\">juick.com &copy; 2008-2012");
+        if (sape != null && visitor == null) {
+            String links = sape.getPageLinks(request.getRequestURI(), request.getCookies()).render();
+            if (links != null && !links.isEmpty()) {
+                out.print("<br/>" + rb.getString("Sponsored by") + ": " + links);
+            }
+        }
+        out.println("</div>");
         out.println("</div>");
     }
 
@@ -331,15 +342,15 @@ public class PageTemplates {
 
                 txt = formatMessage(txt);
 
+                out.print("  <li id=\"msg-" + mid + "\" class=\"msg\"");
                 if (mid == mids.get(0)) {
-                    out.println("  <li class=\"msg\" style=\"border: 0\">");
-                } else {
-                    out.println("  <li class=\"msg\">");
+                    out.print(" style=\"border: 0\"");
                 }
+                out.println(">");
 
                 if (rs.getString(12) != null) {
                     if (rs.getString(12).equals("jpg")) {
-                        out.println("    <div class=\"msg-media\"><img src=\"http://i.juick.com/photos-512/" + mid + ".jpg\" alt=\"\"/></div>");
+                        out.println("    <div class=\"msg-media\"><a href=\"http://i.juick.com/photos-1024/" + mid + ".jpg\"><img src=\"http://i.juick.com/photos-512/" + mid + ".jpg\" alt=\"\"/></a></div>");
                     } else {
                         out.println("    <div class=\"msg-media\"><div id=\"video-" + mid + "\"><b>Attachment: <a href=\"http://i.juick.com/video/" + mid + ".mp4\">Video</a></b></div></div>");
                         out.println("    <script type=\"text/javascript\">");

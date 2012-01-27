@@ -69,7 +69,7 @@ public class Chats {
             out.println("</ul></div>");
             out.println("</div>");
 
-            PageTemplates.pageFooter(out, locale);
+            PageTemplates.pageFooter(request, out, locale, visitor);
         } finally {
             out.close();
         }
