@@ -374,7 +374,7 @@ public class PageTemplates {
                     out.println("    <div class=\"msg-comments\"><a href=\"/" + uname + "/" + mid + "\">" + formatReplies(rs.getInt(10), locale) + "</a> " + rb.getString("(replies) by") + " " + repliesby + "</div>");
                 } else {
                     out.println("    <form action=\"/post\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"mid\" value=\"" + mid + "\"/>");
-                    out.println("      <div class=\"msg-comment\"><textarea name=\"body\" rows=\"1\" placeholder=\"Add a comment...\" onkeypress=\"postformListener(this.form,event)\"></textarea></div>");
+                    out.println("      <div class=\"msg-comment\"><textarea name=\"body\" rows=\"1\" class=\"reply\" placeholder=\"Add a comment...\" onkeypress=\"postformListener(this.form,event)\"></textarea></div>");
                     out.println("    </form>");
                 }
                 out.println("  </li>");

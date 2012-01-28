@@ -121,9 +121,6 @@ public class Blogs {
             }
 
             out.println("</ul>");
-            out.println("<script type=\"text/javascript\">");
-            out.println("$(\"textarea\").autoResize();");
-            out.println("</script>");
 
             if (mids.size() == 20) {
                 String nextpage = "?before=" + mids.get(mids.size() - 1);

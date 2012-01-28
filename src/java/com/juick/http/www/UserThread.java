@@ -72,10 +72,6 @@ public class UserThread {
 
             printReplies(out, sql, MID, locale, listview);
 
-            out.println("<script type=\"text/javascript\">");
-            out.println("$(\"textarea\").autoResize();");
-            out.println("</script>");
-
             out.println("</div>");
 
             out.println("</div>");
@@ -149,7 +145,7 @@ public class UserThread {
                 out.println("    <div class=\"msg-txt\">" + txt + "</div>");
 
                 out.println("    <form action=\"/post\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"mid\" value=\"" + mid + "\"/>");
-                out.println("      <div class=\"msg-comment\"><textarea name=\"body\" rows=\"1\" placeholder=\"Add a comment...\" onkeypress=\"postformListener(this.form,event)\"></textarea></div>");
+                out.println("      <div class=\"msg-comment\"><textarea name=\"body\" rows=\"1\" class=\"reply\" placeholder=\"Add a comment...\" onkeypress=\"postformListener(this.form,event)\"></textarea></div>");
                 out.println("    </form>");
 
                 out.println("  </li>");
