@@ -268,7 +268,7 @@ public class UserThread {
                 out.println("    </ul></div></div>");
                 out.println("    <div class=\"msg-header\"><a href=\"/" + msg.User.UName + "/\">@" + msg.User.UName + "</a>:</div>");
                 out.println("    <div class=\"msg-txt\">" + msg.Text + "</div>");
-                out.println("    <div class=\"msg-links\"><a href=\"#\" onclick=\"return showCommentFormComment(" + msg.MID + "," + msg.RID + ")\">" + rb.getString("Comment") + "</a></div>");
+                out.println("    <div class=\"msg-links\"><a href=\"#\" onclick=\"return showCommentForm(" + msg.MID + "," + msg.RID + ")\">" + rb.getString("Comment") + "</a></div>");
                 out.println("    <div class=\"msg-comment\" style=\"display: none\"></div>");
                 if (ReplyTo == 0) {
                     int childs = msg.getChildsCount() - 1;
@@ -306,7 +306,7 @@ public class UserThread {
             out.println("    </ul></div></div>");
             out.println("    <div class=\"msg-header\"><a href=\"/" + msg.User.UName + "/\">@" + msg.User.UName + "</a>:</div>");
             out.println("    <div class=\"msg-txt\">" + msg.Text + "</div>");
-            out.println("    <div class=\"msg-links\"><a href=\"#\" onclick=\"return showCommentFormComment(" + msg.MID + "," + msg.RID + ")\">" + rb.getString("Comment") + "</a></div>");
+            out.println("    <div class=\"msg-links\"><a href=\"#\" onclick=\"return showCommentForm(" + msg.MID + "," + msg.RID + ")\">" + rb.getString("Comment") + "</a></div>");
             out.println("    <div class=\"msg-comment\" style=\"display: none\"></div>");
             out.println("  </li>");
         }
