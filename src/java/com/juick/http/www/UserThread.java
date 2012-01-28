@@ -141,7 +141,7 @@ public class UserThread {
                     }
                 }
 
-                out.println("    <div class=\"msg-avatar\"><a href=\"/" + uname + "/\"><img src=\"http://i.juick.com/a/" + uid + ".png\"></a></div>");
+                out.println("    <div class=\"msg-avatar\"><a href=\"/" + uname + "/\"><img src=\"http://i.juick.com/a/" + uid + ".png\" alt=\"" + uname + "\"/></a></div>");
                 out.println("    <div class=\"msg-ts\"><a href=\"/" + uname + "/" + mid + "\">" + PageTemplates.formatDate(rs.getInt(8), rs.getString(9), locale) + "</a><div class=\"msg-menu\"><a href=\"#\" onclick=\"$('#msg-menu-" + mid + "').toggle('blind'); return false\"><img src=\"http://static.juick.com/message-menu-icon.png\"></a><ul id=\"msg-menu-" + mid + "\">");
                 out.println("      <li><a href=\"#\" onclick=\"return false\">Under construction</a></li>");
                 out.println("    </ul></div></div>");
@@ -262,8 +262,8 @@ public class UserThread {
                         out.println("    </script>");
                     }
                 }
-                out.println("    <div class=\"msg-avatar\"><a href=\"/" + msg.User.UName + "/\"><img src=\"http://i.juick.com/a/" + msg.User.UID + ".png\"></a></div>");
-                out.println("    <div class=\"msg-ts\"><a href=\"/" + msg.User.UName + "/" + msg.MID + "#" + msg.RID + "\">" + PageTemplates.formatDate(msg.MinutesAgo, msg.TimestampString, locale) + "</a><div class=\"msg-menu\"><a href=\"#\" onclick=\"return msgMenu(" + msg.MID + ")\"><img src=\"http://static.juick.com/message-menu-icon.png\"></a><ul id=\"msg-menu-" + msg.MID + "\">");
+                out.println("    <div class=\"msg-avatar\"><a href=\"/" + msg.User.UName + "/\"><img src=\"http://i.juick.com/a/" + msg.User.UID + ".png\" alt=\"" + msg.User.UName + "\"/></a></div>");
+                out.println("    <div class=\"msg-ts\"><a href=\"/" + msg.User.UName + "/" + msg.MID + "#" + msg.RID + "\">" + PageTemplates.formatDate(msg.MinutesAgo, msg.TimestampString, locale) + "</a><div class=\"msg-menu\"><a href=\"#\" onclick=\"$('#msg-menu-" + msg.MID + "-" + msg.RID + "').toggle('blind'); return false\"><img src=\"http://static.juick.com/message-menu-icon.png\"/></a><ul id=\"msg-menu-" + msg.MID + "-" + msg.RID + "\">");
                 out.println("      <li><a href=\"#\" onclick=\"return false\">Under construction</a></li>");
                 out.println("    </ul></div></div>");
                 out.println("    <div class=\"msg-header\"><a href=\"/" + msg.User.UName + "/\">@" + msg.User.UName + "</a>:</div>");

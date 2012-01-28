@@ -62,7 +62,7 @@ public class PageTemplates {
     public static void pageNavigation(PrintWriter out, Locale loc, com.juick.User user) {
         ResourceBundle rb = ResourceBundle.getBundle("Global", loc);
         out.println("<div id=\"header\">");
-        out.println("<div id=\"logo\"><a href=\"/?show=my\"><img src=\"http://static.juick.com/logo3.png\" width=\"120\" height=\"40\" alt=\"Juick\" border=\"0\"/></a></div>");
+        out.println("<div id=\"logo\"><a href=\"/?show=my\"><img src=\"http://static.juick.com/logo3.png\" width=\"120\" height=\"40\" alt=\"Juick\"/></a></div>");
         out.println("  <ul id=\"nav\">");
         out.println("    <li><a href=\"/\">" + rb.getString("Blogs") + "</a></li>");
 //        out.println("    <li><a href=\"/chats\">" + rb.getString("Chats") + "</a></li>");
@@ -72,7 +72,7 @@ public class PageTemplates {
         out.println("  <ul id=\"nav-right\">");
         if (user != null) {
             out.println("    <li><a href=\"/post\">" + rb.getString("Post") + "</a></li>");
-            out.println("    <li><a href=\"#\" onclick=\"$('#nav-menu').toggle('blind'); return false\"><img src=\"http://i.juick.com/as/" + user.UID + ".png\" alt=\"@\"/>" + user.UName + "</a><ul id=\"nav-menu\">");
+            out.println("    <li><a href=\"#\" onclick=\"$('#nav-menu').toggle('blind'); return false\"><img src=\"http://i.juick.com/as/" + user.UID + ".png\" alt=\"" + user.UName + "\"/>" + user.UName + "</a><ul id=\"nav-menu\">");
             out.println("      <li><a href=\"/" + user.UName + "/\">" + rb.getString("Blog") + "</a></li>");
             out.println("      <li><a href=\"/settings\">" + rb.getString("Settings") + "</a></li>");
             out.println("      <li><a href=\"/logout\">" + rb.getString("Logout") + "</a></li>");
@@ -196,14 +196,14 @@ public class PageTemplates {
         out.println("<div id=\"fwrapper\"><div id=\"footer\">");
         out.println("  <div id=\"footer-right\"><a href=\"/help/contacts\">" + rb.getString("Contacts") + "</a> &#183; <a href=\"/help/\">" + rb.getString("Help") + "</a></div>");
         out.print("  <div id=\"footer-left\">juick.com &copy; 2008-2012");
-        if (sape != null && visitor == null) {
+        if (sape != null && (visitor == null || visitor.UID == 1)) {
             String links = sape.getPageLinks(request.getRequestURI(), request.getCookies()).render();
             if (links != null && !links.isEmpty()) {
                 out.print("<br/>" + rb.getString("Sponsored by") + ": " + links);
             }
         }
         out.println("</div>");
-        out.println("</div>");
+        out.println("</div></div>");
     }
 
     public static String formatTags(String tags) {
@@ -257,35 +257,35 @@ public class PageTemplates {
 
         // #12345
         // <a href="http://juick.com/12345">#12345</a>
-        msg = msg.replaceAll("((?<=\\s)|(?<=\\A)|(?<=[[:punct:]]))#(\\d+)((?=\\s)|(?=\\Z)|(?=\\))|(?=\\.)|(?=\\,))", "$1<a href=\"http://juick.com/$2\">#$2</a>$3");
+        msg = msg.replaceAll("((?<=\\s)|(?<=\\A)|(?<=\\p{Punct}))#(\\d+)((?=\\s)|(?=\\Z)|(?=\\))|(?=\\.)|(?=\\,))", "$1<a href=\"http://juick.com/$2\">#$2</a>$3");
 
         // #12345/65
         // <a href="http://juick.com/12345#65">#12345/65</a>
-        msg = msg.replaceAll("((?<=\\s)|(?<=\\A)|(?<=[[:punct:]]))#(\\d+)/(\\d+)((?=\\s)|(?=\\Z)|(?=[[:punct:]]))", "$1<a href=\"http://juick.com/$2#$3\">#$2/$3</a>$4");
+        msg = msg.replaceAll("((?<=\\s)|(?<=\\A)|(?<=\\p{Punct}))#(\\d+)/(\\d+)((?=\\s)|(?=\\Z)|(?=\\p{Punct}))", "$1<a href=\"http://juick.com/$2#$3\">#$2/$3</a>$4");
 
         // *bold*
         // <b>bold</b>
-        msg = msg.replaceAll("((?<=\\s)|(?<=\\A)|(?<=[[:punct:]]))\\*([^\\*\\n<>]+)\\*((?=\\s)|(?=\\Z)|(?=[[:punct:]]))", "$1<b>$2</b>$3");
+        msg = msg.replaceAll("((?<=\\s)|(?<=\\A)|(?<=\\p{Punct}))\\*([^\\*\\n<>]+)\\*((?=\\s)|(?=\\Z)|(?=\\p{Punct}))", "$1<b>$2</b>$3");
 
         // /italic/
         // <i>italic</i>
-        msg = msg.replaceAll("((?<=\\s)|(?<=\\A))/([^\\/\\n<>]+)/((?=\\s)|(?=\\Z)|(?=[[:punct:]]))", "$1<i>$2</i>$3");
+        msg = msg.replaceAll("((?<=\\s)|(?<=\\A))/([^\\/\\n<>]+)/((?=\\s)|(?=\\Z)|(?=\\p{Punct}))", "$1<i>$2</i>$3");
 
         // _underline_
         // <span class="u">underline</span>
-        msg = msg.replaceAll("((?<=\\s)|(?<=\\A))_([^\\_\\n<>]+)_((?=\\s)|(?=\\Z)|(?=[[:punct:]]))", "$1<span class=\"u\">$2</span>$3");
+        msg = msg.replaceAll("((?<=\\s)|(?<=\\A))_([^\\_\\n<>]+)_((?=\\s)|(?=\\Z)|(?=\\p{Punct}))", "$1<span class=\"u\">$2</span>$3");
 
         // /12
         // <a href="#12">/12</a>
-        msg = msg.replaceAll("((?<=\\s)|(?<=\\A))\\/(\\d+)((?=\\s)|(?=\\Z)|(?=[[:punct:]]))", "$1<a href=\"#$2\">/$2</a>$3");
+        msg = msg.replaceAll("((?<=\\s)|(?<=\\A))\\/(\\d+)((?=\\s)|(?=\\Z)|(?=\\p{Punct}))", "$1<a href=\"#$2\">/$2</a>$3");
 
         // @username@jabber.org
         // <a href="http://juick.com/username@jabber.org/">@username@jabber.org</a>
-        msg = msg.replaceAll("((?<=\\s)|(?<=\\A))@([\\w\\-\\|\\.]+@[\\w\\-\\.]+)((?=\\s)|(?=\\Z)|(?=[[:punct:]]))", "$1<a href=\"http://juick.com/$2/\">@$2</a>$3");
+        msg = msg.replaceAll("((?<=\\s)|(?<=\\A))@([\\w\\-\\.]+@[\\w\\-\\.]+)((?=\\s)|(?=\\Z)|(?=\\p{Punct}))", "$1<a href=\"http://juick.com/$2/\">@$2</a>$3");
 
         // @username
-        // <a href="http://juick.com/username@jabber.org/">@username@jabber.org</a>
-        msg = msg.replaceAll("((?<=\\s)|(?<=\\A))@([\\w\\-]+)((?=\\s)|(?=\\Z)|(?=[[:punct:]]))", "$1<a href=\"http://juick.com/$2/\">@$2</a>$3");
+        // <a href="http://juick.com/username/">@username</a>
+        msg = msg.replaceAll("((?<=\\s)|(?<=\\A))@([\\w\\-]{2,16})((?=\\s)|(?=\\Z)|(?=\\p{Punct}))", "$1<a href=\"http://juick.com/$2/\">@$2</a>$3");
 
         // (http://juick.com/last?page=2)
         // (<a href="http://juick.com/last?page=2" rel="nofollow">juick.com</a>)
@@ -359,7 +359,7 @@ public class PageTemplates {
                     }
                 }
 
-                out.println("    <div class=\"msg-avatar\"><a href=\"/" + uname + "/\"><img src=\"http://i.juick.com/a/" + uid + ".png\"></a></div>");
+                out.println("    <div class=\"msg-avatar\"><a href=\"/" + uname + "/\"><img src=\"http://i.juick.com/a/" + uid + ".png\" alt=\"" + uname + "\"/></a></div>");
                 out.println("    <div class=\"msg-ts\"><a href=\"/" + uname + "/" + mid + "\">" + formatDate(rs.getInt(8), rs.getString(9), locale) + "</a><div class=\"msg-menu\"><a href=\"#\" onclick=\"$('#msg-menu-" + mid + "').toggle('blind'); return false\"><img src=\"http://static.juick.com/message-menu-icon.png\"></a><ul id=\"msg-menu-" + mid + "\">");
                 out.println("      <li><a href=\"#\" onclick=\"return false\">Under construction</a></li>");
                 out.println("    </ul></div></div>");
