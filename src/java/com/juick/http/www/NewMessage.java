@@ -54,10 +54,18 @@ public class NewMessage {
             out.println("<div id=\"wrapper\"><div id=\"content\" class=\"pagetext\">");
             out.println("<form action=\"/post\" method=\"post\" id=\"postmsg\" enctype=\"multipart/form-data\">");
             out.println("<p style=\"text-align: left\"><b>" + rbnm.getString("Location") + ": <span id=\"location\"></span></b> <span id=\"locationclear\">&mdash; <a href=\"#\" onclick=\"clearLocation()\">" + rbnm.getString("Clear") + "</a></span></p>");
-            out.println("<p style=\"text-align: left\"><b>" + rbnm.getString("Attachment") + ":</b> <span id=\"attachmentfile\"><input type=\"file\" name=\"attach\"$canmedia/> " + rbnm.getString("or") + " <a href=\"#\" onclick=\"webcamShow(); return false;\">" + rbnm.getString("from webcam") + "</a><br/>");
+            out.println("<p style=\"text-align: left\"><b>" + rbnm.getString("Attachment") + ":</b> <span id=\"attachmentfile\"><input type=\"file\" name=\"attach\"" + (com.juick.server.UserQueries.getCanMedia(sql, visitor.UID) ? "" : " disabled=\"disabled\"") + "/> " + rbnm.getString("or") + " <a href=\"#\" onclick=\"webcamShow(); return false;\">" + rbnm.getString("from webcam") + "</a><br/>");
             out.println("<i>" + rbnm.getString("Photo_JPG") + "</i></span><span id=\"attachmentwebcam\">" + rbnm.getString("Webcam photo") + " &mdash; <a href=\"#\" onclick=\"clearAttachment(); return false;\">" + rbnm.getString("Clear") + "</a></span></p>");
             out.println("<div id=\"webcamwrap\" style=\"width: 320px; margin: 0 auto\"><div id=\"webcam\"></div></div>");
-            out.println("<p><textarea name=\"body\" rows=\"7\" cols=\"10\">" + "" + "</textarea><br/>");
+
+            String body = request.getParameter("body");
+            if (body != null && body.length() < 4096) {
+                body = Utils.encodeHTML(body);
+            } else {
+                body = "";
+            }
+            out.println("<p><textarea name=\"body\" class=\"newmessage\" rows=\"7\" cols=\"10\">" + body + "</textarea><br/>");
+
             out.println("<input type=\"hidden\" name=\"place_id\"/><input type=\"hidden\" name=\"webcam\"/>" + "" + "<input type=\"submit\" class=\"subm\" value=\"   " + rbnm.getString("Post") + "   \"/></p>");
             out.println("</form>");
             out.println("<div id=\"geomap\"></div>");

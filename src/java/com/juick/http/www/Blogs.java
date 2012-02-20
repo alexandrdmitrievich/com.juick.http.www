@@ -83,17 +83,37 @@ public class Blogs {
                 mids = MessagesQueries.getAll(sql, paramBefore);
             }
         } else if (paramShow.equals("my")) {
-            title = rb.getString("My feed");
-            mids = MessagesQueries.getMyFeed(sql, visitor.UID, paramBefore);
+            if (visitor != null) {
+                title = rb.getString("My feed");
+                mids = MessagesQueries.getMyFeed(sql, visitor.UID, paramBefore);
+            } else {
+                response.sendError(404);
+                return;
+            }
         } else if (paramShow.equals("private")) {
-            title = rb.getString("Private");
-            mids = MessagesQueries.getPrivate(sql, visitor.UID, paramBefore);
+            if (visitor != null) {
+                title = rb.getString("Private");
+                mids = MessagesQueries.getPrivate(sql, visitor.UID, paramBefore);
+            } else {
+                response.sendError(404);
+                return;
+            }
         } else if (paramShow.equals("incoming")) {
-            title = rb.getString("Incoming");
-            mids = MessagesQueries.getIncoming(sql, visitor.UID, paramBefore);
+            if (visitor != null) {
+                title = rb.getString("Incoming");
+                mids = MessagesQueries.getIncoming(sql, visitor.UID, paramBefore);
+            } else {
+                response.sendError(404);
+                return;
+            }
         } else if (paramShow.equals("recommended")) {
-            title = rb.getString("Recommended");
-            mids = MessagesQueries.getRecommended(sql, visitor.UID, paramBefore);
+            if (visitor != null) {
+                title = rb.getString("Recommended");
+                mids = MessagesQueries.getRecommended(sql, visitor.UID, paramBefore);
+            } else {
+                response.sendError(404);
+                return;
+            }
         } else if (paramShow.equals("top")) {
             title = rb.getString("Popular");
             mids = MessagesQueries.getPopular(sql, paramBefore);

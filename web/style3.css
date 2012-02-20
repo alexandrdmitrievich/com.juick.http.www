@@ -54,14 +54,17 @@ img { border: none; }
 #content .msg-ts a { font-size: small; }
 #content .msg-menu { margin: 0 8px; display: inline; position: relative; }
 #content .msg-menu img { vertical-align: top; }
-#content .msg-menu ul { display: none; position: absolute; top: 20px; right: 0; width: 200px; margin: 0; padding: 5px; }
-#content .msg-menu li { margin: 0; padding: 0; }
-#content .msg-header { margin-left: 58px; }
+#content .msg-menu ul { display: none; position: absolute; top: 20px; right: 0; width: 300px; margin: 0; padding: 5px; }
+#content .msg-menu li { margin: 0; padding: 10px 5px; }
+#content .msg-header { margin-left: 58px; overflow: hidden; }
 #content .msg-txt { margin-left: 58px; padding: 6px 0 0 0; }
 #content .msg-links { font-size: small; margin: 10px 0 0 68px; }
 #content .msg-comments { margin: 10px 0 0 58px; padding: 5px 20px; overflow: hidden; font-size: small; }
 #content .msg-comment { margin: 10px 0 0 58px; padding: 0px 0 0 20px; }
-#content textarea { border: 1px solid; width: 556px; padding: 2px; resize: vertical; }
+#content .msg-comment textarea { border: 1px solid; width: 500px; padding: 2px; resize: vertical; }
+#content .msg-comment input { border: 1px solid; width: 50px; margin-left: 5px; vertical-align: top; }
+
+#content textarea.newmessage { border: 1px solid; width: 640px; padding: 2px; resize: vertical; }
 
 #chats li { margin: 16px; }
 
@@ -101,8 +104,14 @@ a { color: #069; }
 #content .msg { border-color: #DDD; }
 #content .msg-comments { background: #F5F5F5; color: #999; }
 #content .msg-ts a { color: #999; }
-#content textarea { border-color: #DDD; }
+#content .msg-links { color: #999; }
+#content .msg-comment textarea { border-color: #DDD; }
+#content .msg-comment input { border-color: #CCC; background-color: #EEE; color: #999; }
 #content .msg-menu ul { background: #DDD; }
+#content .msg-menu a { color: #000; }
+
+#content textarea.newmessage { border-color: #DDD; }
+
 .title2 { background: #F0F0F0; }
 .page { background: #F0F0F0; }
 

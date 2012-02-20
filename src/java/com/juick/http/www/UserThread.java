@@ -17,6 +17,7 @@
  */
 package com.juick.http.www;
 
+import com.juick.server.MessagesQueries;
 import com.juick.server.UserQueries;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,6 +41,11 @@ public class UserThread {
     protected void doGetThread(Connection sql, HttpServletRequest request, HttpServletResponse response, com.juick.User user, int MID) throws ServletException, IOException {
         com.juick.User visitor = Utils.getVisitorUser(sql, request);
         Locale locale = request.getLocale();
+
+        if (!MessagesQueries.canViewThread(sql, MID, visitor != null ? visitor.UID : 0)) {
+            response.sendError(403);
+            return;
+        }
 
         boolean listview = false;
         String paramView = request.getParameter("view");
@@ -65,6 +71,7 @@ public class UserThread {
             PageTemplates.pageNavigation(out, locale, visitor);
             PageTemplates.pageUserTitle(out, sql, locale, user, visitor);
 
+            
             out.println("<div id=\"wrapper\">");
             out.println("<div id=\"content\" style=\"margin-left: 0; width: 100%\">");
 
@@ -105,9 +112,12 @@ public class UserThread {
                 // lat
                 // lon
 
+                boolean cancomment = true;
+
                 tags = (tags != null) ? PageTemplates.formatTags(tags) : "";
                 if (rs.getInt(5) == 1) {
                     tags += " *readonly";
+                    cancomment = false;
                 }
                 switch (rs.getInt(6)) {
                     case 2:
@@ -139,14 +149,18 @@ public class UserThread {
 
                 out.println("    <div class=\"msg-avatar\"><a href=\"/" + uname + "/\"><img src=\"http://i.juick.com/a/" + uid + ".png\" alt=\"" + uname + "\"/></a></div>");
                 out.println("    <div class=\"msg-ts\"><a href=\"/" + uname + "/" + mid + "\">" + PageTemplates.formatDate(rs.getInt(8), rs.getString(9), locale) + "</a><div class=\"msg-menu\"><a href=\"#\" onclick=\"$('#msg-menu-" + mid + "').toggle('blind'); return false\"><img src=\"http://static.juick.com/message-menu-icon.png\"></a><ul id=\"msg-menu-" + mid + "\">");
-                out.println("      <li><a href=\"#\" onclick=\"return false\">Under construction</a></li>");
+                out.println("      <li><a href=\"/post?body=%21%20%23" + mid + "\">" + rb.getString("Recommend message") + "</a></li>");
+                out.println("      <li><a href=\"/post?body=%40" + uname + "%20\">" + rb.getString("Send private message") + "</a></li>");
+                out.println("      <li><a href=\"/post?body=BL%20%40" + uname + "\">" + rb.getString("Block user") + "</a></li>");
                 out.println("    </ul></div></div>");
                 out.println("    <div class=\"msg-header\"><a href=\"/" + uname + "/\">@" + uname + "</a>:" + tags + "</div>");
                 out.println("    <div class=\"msg-txt\">" + txt + "</div>");
 
-                out.println("    <form action=\"/post\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"mid\" value=\"" + mid + "\"/>");
-                out.println("      <div class=\"msg-comment\"><textarea name=\"body\" rows=\"1\" class=\"reply\" placeholder=\"Add a comment...\" onkeypress=\"postformListener(this.form,event)\"></textarea></div>");
-                out.println("    </form>");
+                if (cancomment) {
+                    out.println("    <form action=\"/post\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"mid\" value=\"" + mid + "\"/>");
+                    out.println("      <div class=\"msg-comment\"><textarea name=\"body\" rows=\"1\" class=\"reply\" placeholder=\"Add a comment...\" onkeypress=\"postformListener(this.form,event)\"></textarea><input type=\"submit\" value=\"OK\"/></div>");
+                    out.println("    </form>");
+                }
 
                 out.println("  </li>");
                 out.println("</ul>");
@@ -259,8 +273,9 @@ public class UserThread {
                     }
                 }
                 out.println("    <div class=\"msg-avatar\"><a href=\"/" + msg.User.UName + "/\"><img src=\"http://i.juick.com/a/" + msg.User.UID + ".png\" alt=\"" + msg.User.UName + "\"/></a></div>");
-                out.println("    <div class=\"msg-ts\"><a href=\"/" + msg.User.UName + "/" + msg.MID + "#" + msg.RID + "\">" + PageTemplates.formatDate(msg.MinutesAgo, msg.TimestampString, locale) + "</a><div class=\"msg-menu\"><a href=\"#\" onclick=\"$('#msg-menu-" + msg.MID + "-" + msg.RID + "').toggle('blind'); return false\"><img src=\"http://static.juick.com/message-menu-icon.png\"/></a><ul id=\"msg-menu-" + msg.MID + "-" + msg.RID + "\">");
-                out.println("      <li><a href=\"#\" onclick=\"return false\">Under construction</a></li>");
+                out.println("    <div class=\"msg-ts\"><a href=\"/" + msg.MID + "#" + msg.RID + "\">" + PageTemplates.formatDate(msg.MinutesAgo, msg.TimestampString, locale) + "</a><div class=\"msg-menu\"><a href=\"#\" onclick=\"$('#msg-menu-" + msg.MID + "-" + msg.RID + "').toggle('blind'); return false\"><img src=\"http://static.juick.com/message-menu-icon.png\"/></a><ul id=\"msg-menu-" + msg.MID + "-" + msg.RID + "\">");
+                out.println("      <li><a href=\"/post?body=%40" + msg.User.UName + "%20\">" + rb.getString("Send private message") + "</a></li>");
+                out.println("      <li><a href=\"/post?body=BL%20%40" + msg.User.UName + "\">" + rb.getString("Block user") + "</a></li>");
                 out.println("    </ul></div></div>");
                 out.println("    <div class=\"msg-header\"><a href=\"/" + msg.User.UName + "/\">@" + msg.User.UName + "</a>:</div>");
                 out.println("    <div class=\"msg-txt\">" + msg.Text + "</div>");
@@ -297,12 +312,17 @@ public class UserThread {
                 }
             }
             out.println("    <div class=\"msg-avatar\"><a href=\"/" + msg.User.UName + "/\"><img src=\"http://i.juick.com/a/" + msg.User.UID + ".png\"></a></div>");
-            out.println("    <div class=\"msg-ts\"><a href=\"/" + msg.User.UName + "/" + msg.MID + "#" + msg.RID + "\">" + PageTemplates.formatDate(msg.MinutesAgo, msg.TimestampString, locale) + "</a><div class=\"msg-menu\"><a href=\"#\" onclick=\"return msgMenu(" + msg.MID + ")\"><img src=\"http://static.juick.com/message-menu-icon.png\"></a><ul id=\"msg-menu-" + msg.MID + "\">");
-            out.println("      <li><a href=\"#\" onclick=\"return false\">Under construction</a></li>");
+            out.println("    <div class=\"msg-ts\"><a href=\"/" + msg.MID + "#" + msg.RID + "\">" + PageTemplates.formatDate(msg.MinutesAgo, msg.TimestampString, locale) + "</a><div class=\"msg-menu\"><a href=\"#\" onclick=\"$('#msg-menu-" + msg.MID + "-" + msg.RID + "').toggle('blind'); return false\"><img src=\"http://static.juick.com/message-menu-icon.png\"></a><ul id=\"msg-menu-" + msg.MID + "\">");
+            out.println("      <li><a href=\"/post?body=%40" + msg.User.UName + "%20\">" + rb.getString("Send private message") + "</a></li>");
+            out.println("      <li><a href=\"/post?body=BL%20%40" + msg.User.UName + "\">" + rb.getString("Block user") + "</a></li>");
             out.println("    </ul></div></div>");
             out.println("    <div class=\"msg-header\"><a href=\"/" + msg.User.UName + "/\">@" + msg.User.UName + "</a>:</div>");
             out.println("    <div class=\"msg-txt\">" + msg.Text + "</div>");
-            out.println("    <div class=\"msg-links\"><a href=\"#\" onclick=\"return showCommentForm(" + msg.MID + "," + msg.RID + ")\">" + rb.getString("Comment") + "</a></div>");
+            out.print("    <div class=\"msg-links\">/" + msg.RID);
+            if (msg.ReplyTo > 0) {
+                out.print(" " + rb.getString("in reply to") + " <a href=\"#" + msg.ReplyTo + "\">/" + msg.ReplyTo + "</a>");
+            }
+            out.println(" &#183; <a href=\"#\" onclick=\"return showCommentForm(" + msg.MID + "," + msg.RID + ")\">" + rb.getString("Comment") + "</a></div>");
             out.println("    <div class=\"msg-comment\" style=\"display: none\"></div>");
             out.println("  </li>");
         }

@@ -73,7 +73,7 @@ public class Login {
         if (com.juick.server.UserQueries.getUIDbyHash(sql, hash) > 0) {
             Cookie c = new Cookie("hash", hash);
             c.setDomain(".juick.com");
-            c.setMaxAge(0);
+            c.setMaxAge(365 * 24 * 60 * 60);
             response.addCookie(c);
 
             response.sendRedirect("/");
@@ -95,7 +95,7 @@ public class Login {
             String hash = com.juick.server.UserQueries.getHashByUID(sql, uid);
             Cookie c = new Cookie("hash", hash);
             c.setDomain(".juick.com");
-            c.setMaxAge(0);
+            c.setMaxAge(365 * 24 * 60 * 60);
             response.addCookie(c);
 
             String referer = request.getHeader("Referer");

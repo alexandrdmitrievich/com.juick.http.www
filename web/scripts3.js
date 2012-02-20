@@ -39,9 +39,9 @@ function showCommentForm(mid,rid) {
         var c=$('#replies #'+rid+' .msg-comment');
         c.wrap('<form action="/post" method="POST" enctype="multipart/form-data"/>');
         c.before('<input type="hidden" name="mid" value="'+mid+'"/><input type="hidden" name="rid" value="'+rid+'"/>');
-        c.append('<textarea name="body" rows="1" class="reply" placeholder="Add a comment..." onkeypress="postformListener(this.form,event)"></textarea>');
+        c.append('<textarea name="body" rows="1" class="reply" placeholder="Add a comment..." onkeypress="postformListener(this.form,event)"></textarea><input type="submit" value="OK"/>');
     }
-    $('#replies #'+rid+' .msg-links').hide();
+//    $('#replies #'+rid+' .msg-links').hide();
     $('#replies #'+rid+' .msg-comment').show();
     $('#replies #'+rid+' textarea')[0].focus();
     $('#replies #'+rid+' textarea').autoResize({

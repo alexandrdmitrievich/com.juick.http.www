@@ -149,7 +149,7 @@ public class Main extends HttpServlet implements XmppListener {
             //TODO settings
         } else if (uri.matches("^/\\d+$")) {
             rootRedirects.doGetPostID(sql, request, response);
-        } else if (uri.matches("^/[^/]$")) {
+        } else if (uri.matches("^/[^/]+$")) {
             rootRedirects.doGetUsername(sql, request, response);
         } else if (uri.matches("^/.+/.*")) {
             String uriparts[] = uri.split("/");

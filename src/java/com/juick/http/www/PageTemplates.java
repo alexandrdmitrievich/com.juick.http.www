@@ -62,7 +62,7 @@ public class PageTemplates {
     public static void pageNavigation(PrintWriter out, Locale loc, com.juick.User user) {
         ResourceBundle rb = ResourceBundle.getBundle("Global", loc);
         out.println("<div id=\"header\">");
-        out.println("<div id=\"logo\"><a href=\"/?show=my\"><img src=\"http://static.juick.com/logo3.png\" width=\"120\" height=\"40\" alt=\"Juick\"/></a></div>");
+        out.println("<div id=\"logo\"><a href=\"" + (user != null ? "/?show=my" : "/") + "\"><img src=\"http://static.juick.com/logo3.png\" width=\"120\" height=\"40\" alt=\"Juick\"/></a></div>");
         out.println("  <ul id=\"nav\">");
         out.println("    <li><a href=\"/\">" + rb.getString("Blogs") + "</a></li>");
 //        out.println("    <li><a href=\"/chats\">" + rb.getString("Chats") + "</a></li>");
@@ -324,9 +324,12 @@ public class PageTemplates {
                 // lat
                 // lon
 
+                boolean cancomment = true;
+
                 tags = (tags != null) ? formatTags(tags) : "";
                 if (rs.getInt(5) == 1) {
                     tags += " *readonly";
+                    cancomment = false;
                 }
                 switch (rs.getInt(6)) {
                     case 2:
@@ -361,7 +364,9 @@ public class PageTemplates {
 
                 out.println("    <div class=\"msg-avatar\"><a href=\"/" + uname + "/\"><img src=\"http://i.juick.com/a/" + uid + ".png\" alt=\"" + uname + "\"/></a></div>");
                 out.println("    <div class=\"msg-ts\"><a href=\"/" + uname + "/" + mid + "\">" + formatDate(rs.getInt(8), rs.getString(9), locale) + "</a><div class=\"msg-menu\"><a href=\"#\" onclick=\"$('#msg-menu-" + mid + "').toggle('blind'); return false\"><img src=\"http://static.juick.com/message-menu-icon.png\"></a><ul id=\"msg-menu-" + mid + "\">");
-                out.println("      <li><a href=\"#\" onclick=\"return false\">Under construction</a></li>");
+                out.println("      <li><a href=\"/post?body=%21%20%23" + mid + "\">" + rb.getString("Recommend message") + "</a></li>");
+                out.println("      <li><a href=\"/post?body=%40" + uname + "%20\">" + rb.getString("Send private message") + "</a></li>");
+                out.println("      <li><a href=\"/post?body=BL%20%40" + uname + "\">" + rb.getString("Block user") + "</a></li>");
                 out.println("    </ul></div></div>");
                 out.println("    <div class=\"msg-header\"><a href=\"/" + uname + "/\">@" + uname + "</a>:" + tags + "</div>");
                 out.println("    <div class=\"msg-txt\">" + txt + "</div>");
@@ -372,9 +377,9 @@ public class PageTemplates {
                         repliesby = "...";
                     }
                     out.println("    <div class=\"msg-comments\"><a href=\"/" + uname + "/" + mid + "\">" + formatReplies(rs.getInt(10), locale) + "</a> " + rb.getString("(replies) by") + " " + repliesby + "</div>");
-                } else {
+                } else if (cancomment) {
                     out.println("    <form action=\"/post\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"mid\" value=\"" + mid + "\"/>");
-                    out.println("      <div class=\"msg-comment\"><textarea name=\"body\" rows=\"1\" class=\"reply\" placeholder=\"Add a comment...\" onkeypress=\"postformListener(this.form,event)\"></textarea></div>");
+                    out.println("      <div class=\"msg-comment\"><textarea name=\"body\" rows=\"1\" class=\"reply\" placeholder=\"Add a comment...\" onkeypress=\"postformListener(this.form,event)\"></textarea><input type=\"submit\" value=\"OK\"/></div>");
                     out.println("    </form>");
                 }
                 out.println("  </li>");
