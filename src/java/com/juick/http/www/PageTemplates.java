@@ -27,6 +27,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import ru.sape.Sape;
 
@@ -241,6 +243,7 @@ public class PageTemplates {
     public static String formatReplies(int replies, Locale loc) {
         return replies + " repl" + (replies % 10 == 1 ? "y" : "ies");
     }
+    private static Pattern regexLinks2 = Pattern.compile("((?<=\\s)|(?<=\\A))([\\[\\{]|&lt;)((?:ht|f)tps?://(?:www\\.)?([^\\/\\s\\\"\\)\\!]+)/?(?:[^\\]\\}](?<!&gt;))*)([\\]\\}]|&gt;)");
 
     public static String formatMessage(String msg) {
         msg = msg.replaceAll("&", "&amp;");
@@ -289,10 +292,17 @@ public class PageTemplates {
 
         // (http://juick.com/last?page=2)
         // (<a href="http://juick.com/last?page=2" rel="nofollow">juick.com</a>)
-        msg = msg.replaceAll("((?<=\\s)|(?<=\\A))([\\(\\[\\{]|&lt;)((?:ht|f)tps?://(?:www\\.)?([^\\/\\s\\n\\\"\\)\\!]+)/?[^\\s]*)([\\)\\]\\}]|&gt;)", "$1$2<a href=\"$3\" rel=\"nofollow\">$4</a>$5");
+        Matcher m = regexLinks2.matcher(msg);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String url = m.group(3).replace(" ", "%20").replaceAll("\\s", "");
+            m.appendReplacement(sb, "$1$2<a href=\"" + url + "\" rel=\"nofollow\">$4</a>$5");
+        }
+        m.appendTail(sb);
+        msg = sb.toString();
 
         // > citate
-        msg = msg.replaceAll("(?:(?<=\\n)|(?<=\\A))&gt;\\s(.*)(\\n|(?=\\Z))", "<blockquote>$1</blockquote>");
+        msg = msg.replaceAll("(?:(?<=\\n)|(?<=\\A))&gt;\\s*(.*)(\\n|(?=\\Z))", "<blockquote>$1</blockquote>");
         msg = msg.replaceAll("</blockquote><blockquote>", "\n");
 
         msg = msg.replaceAll("\n", "<br/>\n");
