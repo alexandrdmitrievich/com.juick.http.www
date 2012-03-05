@@ -46,12 +46,12 @@ public class PageTemplates {
         out.println("<head>");
         out.println("  <meta charset=\"utf-8\"/>");
         out.println("  <title>" + title + "</title>");
-        out.println("  <link rel=\"stylesheet\" href=\"http://static.juick.com/style3.css\"/>");
+        out.println("  <link rel=\"stylesheet\" href=\"http://static.juick.com/style3.css?20120306\"/>");
         out.println("  <link rel=\"icon\" type=\"image/png\" href=\"http://static.juick.com/favicon.png\"/>");
         out.println("  <script type=\"text/javascript\" src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js\"></script>");
         out.println("  <script type=\"text/javascript\" src=\"https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js\"></script>");
         out.println("  <script type=\"text/javascript\" src=\"https://ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js\"></script>");
-        out.println("  <script type=\"text/javascript\" src=\"http://static.juick.com/scripts3.js\"></script>");
+        out.println("  <script type=\"text/javascript\" src=\"http://static.juick.com/scripts3.js?20120306\"></script>");
         out.println("  <script type=\"text/javascript\" src=\"http://static.juick.com/js/jquery.autoresize.js\"></script>");
         if (headers != null) {
             out.println(headers);

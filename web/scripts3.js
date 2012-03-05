@@ -41,7 +41,7 @@ function showCommentForm(mid,rid) {
         c.before('<input type="hidden" name="mid" value="'+mid+'"/><input type="hidden" name="rid" value="'+rid+'"/>');
         c.append('<textarea name="body" rows="1" class="reply" placeholder="Add a comment..." onkeypress="postformListener(this.form,event)"></textarea><input type="submit" value="OK"/>');
     }
-//    $('#replies #'+rid+' .msg-links').hide();
+    //    $('#replies #'+rid+' .msg-links').hide();
     $('#replies #'+rid+' .msg-comment').show();
     $('#replies #'+rid+' textarea')[0].focus();
     $('#replies #'+rid+' textarea').autoResize({
@@ -49,6 +49,17 @@ function showCommentForm(mid,rid) {
         minHeight: 1
     });
     return false;
+}
+
+function unfoldReply() {
+    if((0+window.location.hash.substring(1))>0) {
+        var el=$(window.location.hash);
+        while(el.is(":hidden")) {
+            el=el.prev();
+        }
+        showMoreReplies(el.attr('id'));
+        window.location.replace(window.location.hash);
+    }
 }
 
 $(document).ready(function() {

@@ -71,7 +71,7 @@ public class UserThread {
             PageTemplates.pageNavigation(out, locale, visitor);
             PageTemplates.pageUserTitle(out, sql, locale, user, visitor);
 
-            
+
             out.println("<div id=\"wrapper\">");
             out.println("<div id=\"content\" style=\"margin-left: 0; width: 100%\">");
 
@@ -80,8 +80,13 @@ public class UserThread {
             printReplies(out, sql, MID, locale, listview);
 
             out.println("</div>");
-
+            
             out.println("</div>");
+
+            out.println("<script type=\"text/javascript\">");
+            out.println("$(document).ready(unfoldReply);");
+            out.println("$(window).bind('hashchange',unfoldReply);");
+            out.println("</script>");
 
             PageTemplates.pageFooter(request, out, locale, visitor);
         } finally {
