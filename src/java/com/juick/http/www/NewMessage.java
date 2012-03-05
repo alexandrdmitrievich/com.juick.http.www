@@ -59,10 +59,13 @@ public class NewMessage {
             out.println("<div id=\"webcamwrap\" style=\"width: 320px; margin: 0 auto\"><div id=\"webcam\"></div></div>");
 
             String body = request.getParameter("body");
-            if (body != null && body.length() < 4096) {
-                body = Utils.encodeHTML(body);
-            } else {
+            if (body == null) {
                 body = "";
+            } else {
+                if (body.length() > 4096) {
+                    body = body.substring(0, 4096);
+                }
+                body = Utils.encodeHTML(body);
             }
             out.println("<p><textarea name=\"body\" class=\"newmessage\" rows=\"7\" cols=\"10\">" + body + "</textarea><br/>");
 

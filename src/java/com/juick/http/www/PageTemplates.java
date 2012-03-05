@@ -183,8 +183,8 @@ public class PageTemplates {
         out.println("<div id=\"title\"><div id=\"title-container\">");
         out.println("  <div id=\"title-av\"><a href=\"/" + user.UName + "/\"><img src=\"http://i.juick.com/a/" + user.UID + ".png\" width=\"96\" height=\"96\" alt=\"" + user.UName + "\"/></a></div>");
         out.println("  <div id=\"title-stats\"><ul>");
-        out.println("    <li>" + rb.getString("(Stats) I read") + ": " + iread + "</li>");
-        out.println("    <li>" + rb.getString("(Stats) My readers") + ": " + myreaders + "</li>");
+        out.println("    <li><a href=\"/" + user.UName + "/friends\">" + rb.getString("(Stats) I read") + ": " + iread + "</a></li>");
+        out.println("    <li><a href=\"/" + user.UName + "/readers\">" + rb.getString("(Stats) My readers") + ": " + myreaders + "</a></li>");
         out.println("    <li>" + rb.getString("(Stats) Messages") + ": " + messages + "</li>");
         out.println("    <li>" + rb.getString("(Stats) Replies") + ": " + replies + "</li>");
         out.println("  </ul></div>");
@@ -295,14 +295,14 @@ public class PageTemplates {
         Matcher m = regexLinks2.matcher(msg);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
-            String url = m.group(3).replace(" ", "%20").replaceAll("\\s", "");
+            String url = m.group(3).replace(" ", "%20").replaceAll("\\s+", "");
             m.appendReplacement(sb, "$1$2<a href=\"" + url + "\" rel=\"nofollow\">$4</a>$5");
         }
         m.appendTail(sb);
         msg = sb.toString();
 
         // > citate
-        msg = msg.replaceAll("(?:(?<=\\n)|(?<=\\A))&gt;\\s*(.*)(\\n|(?=\\Z))", "<blockquote>$1</blockquote>");
+        msg = msg.replaceAll("(?:(?<=\\n)|(?<=\\A))&gt; *(.*)?(\\n|(?=\\Z))", "<blockquote>$1</blockquote>");
         msg = msg.replaceAll("</blockquote><blockquote>", "\n");
 
         msg = msg.replaceAll("\n", "<br/>\n");

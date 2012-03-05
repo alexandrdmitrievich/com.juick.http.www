@@ -66,6 +66,10 @@ img { border: none; }
 
 #content textarea.newmessage { border: 1px solid; width: 640px; padding: 2px; resize: vertical; }
 
+table.users { width: 100%; margin: 10px 0; }
+table.users td { width: 33%; padding: 6px 0; overflow: hidden; }
+table.users img { width: 32px; height: 32px; vertical-align: middle; margin-right: 6px; }
+
 #chats li { margin: 16px; }
 
 .title2 { padding: 10px 20px; margin: 20px 0 10px 0; }
@@ -85,7 +89,8 @@ img { border: none; }
 #column li { margin: 0; padding: 2px 0 2px 10px; }
 #column p { font-size: 14px; margin: 0 0 0 10px; }
 #column .inp { width: 195px; }
-#column h2 { border-bottom: 1px solid; font-size: 18px; margin: 24px 0 8px 0; padding: 0 0 2px 2px; }
+#column h2 { border-bottom: 1px solid; font-size: 18px; margin: 24px 0 8px 0; padding: 0 2px 2px 2px; }
+#column h2>a { float: right; }
 
 /********/
 

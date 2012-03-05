@@ -159,6 +159,12 @@ public class Main extends HttpServlet implements XmppListener {
                     pagesUser.doGetBlog(sql, sqlSearch, request, response, user);
                 } else if (uriparts[2].equals("info")) {
                     pagesUser.doGetInfo(sql, request, response, user);
+                } else if (uriparts[2].equals("tags")) {
+                    pagesUser.doGetTags(sql, request, response, user);
+                } else if (uriparts[2].equals("friends")) {
+                    pagesUser.doGetFriends(sql, request, response, user);
+                } else if (uriparts[2].equals("readers")) {
+                    pagesUser.doGetReaders(sql, request, response, user);
                 } else {
                     int mid = 0;
                     try {
