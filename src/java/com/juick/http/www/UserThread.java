@@ -106,7 +106,7 @@ public class UserThread {
             if (rs.first()) {
                 int uid = rs.getInt(2);
                 String uname = rs.getString(3);
-                String tags = rs.getString(4);
+                String tags = "";
                 String txt = rs.getString(7);
                 // timediff
                 // timestamp
@@ -118,8 +118,11 @@ public class UserThread {
                 // lon
 
                 boolean cancomment = true;
+                
+                if(rs.getString(4)!= null){
+                    tags = PageTemplates.formatTags(tags);
+                }
 
-                tags = (tags != null) ? PageTemplates.formatTags(tags) : "";
                 if (rs.getInt(5) == 1) {
                     tags += " *readonly";
                     cancomment = false;
