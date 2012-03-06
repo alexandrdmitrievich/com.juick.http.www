@@ -38,6 +38,30 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class UserThread {
 
+    public String mediaOut(String type, int mid, int rid, /*int size, */int link = 0)
+    {
+        String ret=""; // TODO доделать 
+         if (type != null) {
+                    if (type.equals("jpg")) {
+                        if(link == 0) 
+                            {
+                                ret+=("    <div class=\"msg-media\"><img src=\"http://i.juick.com/photos-512/" + mid + "-" + rid + ".jpg\" alt=\"\"/></div>");
+                            }
+                        else 
+                            {
+                             ret+=("    <div class=\"msg-media\"><a href=\"http://i.juick.com/photos-1024/" + mid + ".jpg\"><img src=\"http://i.juick.com/photos-512/" + mid + ".jpg\" alt=\"\"/></a></div>");
+                            }
+                    
+                    } else {
+                        ret+=("    <div class=\"msg-media\"><div id=\"video-" + mid + "-" + rid + "\"><b>Attachment: <a href=\"http://i.juick.com/video/" +mid+ "-" + rid + ".mp4\">Video</a></b></div></div>");
+                        ret+=("    <script type=\"text/javascript\">");
+                        ret+=("    inlinevideo('" +mid + "-" + rid + "');");
+                        ret+=("    </script>");
+                    }
+                }
+        
+    }
+
     protected void doGetThread(Connection sql, HttpServletRequest request, HttpServletResponse response, com.juick.User user, int MID) throws ServletException, IOException {
         com.juick.User visitor = Utils.getVisitorUser(sql, request);
         Locale locale = request.getLocale();
@@ -49,7 +73,24 @@ public class UserThread {
 
         boolean listview = false;
         String paramView = request.getParameter("view");
-        if (paramView != null) {
+        
+        if(visitor == null) 
+        {
+            listview = false;
+        }
+        else
+        {
+            listview = true;
+            if (paramView.equals("list")) {
+                UserQueries.setUserOptionInt(sql, visitor.UID, "repliesview", 1);
+            }
+            else if (paramView.equals("tree")) {
+                UserQueries.setUserOptionInt(sql, visitor.UID, "repliesview", 0);
+            }
+            
+
+        }
+    /*    if (paramView != null) {
             if (paramView.equals("list")) {
                 listview = true;
                 if (visitor != null) {
@@ -60,7 +101,7 @@ public class UserThread {
             }
         } else if (visitor != null && UserQueries.getUserOptionInt(sql, visitor.UID, "repliesview", 0) == 1) {
             listview = true;
-        }
+        }*/
 
         String title = "@" + user.UName + " - #" + MID;
 
@@ -99,7 +140,7 @@ public class UserThread {
 
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        try {
+        try { 
             stmt = sql.prepareStatement("SELECT STRAIGHT_JOIN messages.message_id,messages.user_id,users.nick,messages_txt.tags,messages.readonly,messages.privacy,messages_txt.txt,TIMESTAMPDIFF(MINUTE,messages.ts,NOW()),messages.ts,messages.replies,messages.attach,messages.place_id,places.name,messages.lat,messages.lon FROM ((messages INNER JOIN messages_txt ON messages.message_id=messages_txt.message_id) INNER JOIN users ON messages.user_id=users.id) LEFT JOIN places ON messages.place_id=places.place_id WHERE messages.message_id=?");
             stmt.setInt(1, mid);
             rs = stmt.executeQuery();
@@ -187,6 +228,11 @@ public class UserThread {
 
         PreparedStatement stmt = null;
         ResultSet rs = null;
+        
+        boolean added = false;
+        
+        int i = 0
+        
         try {
             stmt = sql.prepareStatement("SELECT replies.reply_id,replies.replyto,replies.user_id,users.nick,replies.txt,TIMESTAMPDIFF(MINUTE,replies.ts,NOW()),replies.ts,replies.attach FROM replies INNER JOIN users ON replies.user_id=users.id WHERE replies.message_id=? ORDER BY replies.reply_id ASC");
             stmt.setInt(1, mid);
@@ -208,15 +254,16 @@ public class UserThread {
                 replies.add(msg);
 
                 if (msg.ReplyTo > 0) {
-                    boolean added = false;
-                    for (int i = 0; i < replies.size(); i++) {
-                        if (replies.get(i).RID == msg.ReplyTo) {
-                            replies.get(i).childs.add(msg);
-                            added = true;
-                            break;
-                        }
+                    added = false;
+                    for (i = 0; i < replies.size(),added != true; i++) {  
+                            if(replies.get(i).RID == msg.ReplyTo)
+                            {
+                                replies.get(i).childs.add(msg);
+                                added = true;
+                            }
+                            //break;
                     }
-                    if (!added) {
+                    if (added == false) {
                         msg.ReplyTo = 0;
                     }
                 }
@@ -244,7 +291,7 @@ public class UserThread {
             if (listview) {
                 printList(out, replies, locale);
             } else {
-                printTree(out, replies, 0, 0, locale);
+                printTree(out, replies, locale);
             }
             out.println("</ul>");
         }
@@ -255,7 +302,7 @@ public class UserThread {
         replies.clear();
     }
 
-    public static void printTree(PrintWriter out, ArrayList<com.juick.Message> replies, int ReplyTo, int margin, Locale locale) {
+    public static void printTree(PrintWriter out, ArrayList<com.juick.Message> replies,  Locale locale, int ReplyTo = 0, int margin = 0) {
         ResourceBundle rb = ResourceBundle.getBundle("Global", locale);
 
         for (int i = 0; i < replies.size(); i++) {
