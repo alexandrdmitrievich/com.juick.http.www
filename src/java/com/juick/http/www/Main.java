@@ -146,7 +146,7 @@ public class Main extends HttpServlet implements XmppListener {
         } else if (uri.equals("/logout")) {
             login.doGetLogout(sql, request, response);
         } else if (uri.equals("/settings")) {
-            //TODO settings
+            response.sendError(404); //TODO settings
         } else if (uri.matches("^/\\d+$")) {
             rootRedirects.doGetPostID(sql, request, response);
         } else if (uri.matches("^/[^/]+$")) {
